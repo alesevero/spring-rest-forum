@@ -6,37 +6,37 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TopicDTO {
+public class TopicoDTO {
 
     private Long id;
-    private String title;
-    private String message;
-    private LocalDateTime createdAt;
+    private String titulo;
+    private String mensagem;
+    private LocalDateTime dataCriacao;
 
-    public TopicDTO(Topico topico) {
+    public TopicoDTO(Topico topico) {
         this.id = topico.getId();
-        this.title = topico.getTitulo();
-        this.message = topico.getMensagem();
-        this.createdAt = topico.getDataCriacao();
+        this.titulo = topico.getTitulo();
+        this.mensagem = topico.getMensagem();
+        this.dataCriacao = topico.getDataCriacao();
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getTitulo() {
+        return titulo;
     }
 
-    public String getMessage() {
-        return message;
+    public String getMensagem() {
+        return mensagem;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
     }
 
-    public static List<TopicDTO> convert(List<Topico> topicos) {
-        return topicos.stream().map(TopicDTO::new).collect(Collectors.toList());
+    public static List<TopicoDTO> convert(List<Topico> topicos) {
+        return topicos.stream().map(TopicoDTO::new).collect(Collectors.toList());
     }
 }

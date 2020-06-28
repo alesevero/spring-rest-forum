@@ -8,13 +8,18 @@ import com.alesevero.forum.model.Topico;
 import com.alesevero.forum.repository.Cursos;
 import com.alesevero.forum.repository.Topicos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/topicos")
@@ -30,14 +35,22 @@ public class TopicoController {
     }
 
     @GetMapping(value = "/", produces = "application/json;charset=UTF-8")
-    public List<TopicoDTO> list(String nomeCurso) {
+    @Cacheable(value = "lista-de-topicos")
+    public Page<TopicoDTO> list
+            (@RequestParam(required = false) String nomeCurso,
+             @PageableDefault(sort = "id",
+                     direction = Sort.Direction.ASC,
+                     page = 0,
+                     size = 5) Pageable paginacao) {
         return nomeCurso != null
-                ? TopicoDTO.convert(topicos.findByCursoNome(nomeCurso))
-                : TopicoDTO.convert(topicos.findAll());
+                ? TopicoDTO
+                .converter(topicos.findByCursoNome(nomeCurso, paginacao))
+                : TopicoDTO.converter(topicos.findAll(paginacao));
     }
 
     @PostMapping(value = "/", consumes = "application/json;charset=UTF-8")
     @Transactional
+    @CacheEvict(value = "lista-de-topicos", allEntries = true)
     public ResponseEntity cadastrar
             (@RequestBody @Valid TopicoForm topicoForm,
              UriComponentsBuilder uriBuilder) {
@@ -60,6 +73,7 @@ public class TopicoController {
 
     @PutMapping(value = "/{id}")
     @Transactional
+    @CacheEvict(value = "lista-de-topicos", allEntries = true)
     public ResponseEntity atualizar
             (@PathVariable Long id,
              @RequestBody AtualizarTopicoForm form) {
@@ -72,6 +86,7 @@ public class TopicoController {
 
     @DeleteMapping("/{id}")
     @Transactional
+    @CacheEvict(value = "lista-de-topicos", allEntries = true)
     public ResponseEntity remover(@PathVariable Long id) {
         topicos.deleteById(id);
         return ResponseEntity.ok().build();

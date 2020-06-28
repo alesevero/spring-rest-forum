@@ -17,8 +17,13 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ValidationErrorHandler {
 
+    private final MessageSource messageSource;
+
     @Autowired
-    private MessageSource messageSource;
+    public ValidationErrorHandler
+            (MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
